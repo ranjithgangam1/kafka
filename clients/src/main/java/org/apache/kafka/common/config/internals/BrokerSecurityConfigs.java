@@ -17,6 +17,7 @@
 package org.apache.kafka.common.config.internals;
 
 import org.apache.kafka.common.config.SaslConfigs;
+import org.apache.kafka.server.interceptor.DefaultBrokerInterceptor;
 
 import java.util.Collections;
 import java.util.List;
@@ -67,4 +68,7 @@ public class BrokerSecurityConfigs {
             + "Only GSSAPI is enabled by default.";
     public static final List<String> DEFAULT_SASL_ENABLED_MECHANISMS = Collections.singletonList(SaslConfigs.GSSAPI_MECHANISM);
 
+    public static final String BROKER_INTERCEPTOR_CLASS_CONFIG = "broker.interceptor.class";
+    public static final String BROKER_INTERCEPTOR_CLASS_DOC = "Optional custom interceptor capable of modifying inbound requests and outbound responses.";
+    public static final Class<?> BROKER_INTERCEPTOR_CLASS_DEFAULT = DefaultBrokerInterceptor.class;
 }

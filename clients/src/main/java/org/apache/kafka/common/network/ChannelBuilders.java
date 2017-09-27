@@ -27,6 +27,8 @@ import org.apache.kafka.common.security.auth.KafkaPrincipalBuilder;
 import org.apache.kafka.common.security.authenticator.CredentialCache;
 import org.apache.kafka.common.security.kerberos.KerberosShortNamer;
 import org.apache.kafka.common.utils.Utils;
+import org.apache.kafka.server.interceptor.BrokerInterceptor;
+import org.apache.kafka.server.interceptor.DefaultBrokerInterceptor;
 
 import java.util.Map;
 
@@ -105,7 +107,7 @@ public class ChannelBuilders {
                         clientSaslMechanism, saslHandshakeRequestEnable, credentialCache);
                 break;
             case PLAINTEXT:
-                channelBuilder = new PlaintextChannelBuilder();
+                channelBuilder = new PlaintextChannelBuilder(mode);
                 break;
             default:
                 throw new IllegalArgumentException("Unexpected securityProtocol " + securityProtocol);
@@ -113,6 +115,18 @@ public class ChannelBuilders {
 
         channelBuilder.configure(configs);
         return channelBuilder;
+    }
+
+    public static BrokerInterceptor buildBrokerInterceptor(Map<String, ?> configs) {
+        BrokerInterceptor interceptor = new DefaultBrokerInterceptor();
+        if (configs.containsKey(BrokerSecurityConfigs.BROKER_INTERCEPTOR_CLASS_CONFIG)) {
+            @SuppressWarnings("unchecked")
+            Class<? extends BrokerInterceptor> interceptorClass = (Class<? extends BrokerInterceptor>) configs.get(
+                    BrokerSecurityConfigs.BROKER_INTERCEPTOR_CLASS_CONFIG);
+            interceptor = Utils.newInstance(interceptorClass);
+        }
+        interceptor.configure(configs);
+        return interceptor;
     }
 
     private static void requireNonNullMode(Mode mode, SecurityProtocol securityProtocol) {

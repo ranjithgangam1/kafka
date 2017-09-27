@@ -29,6 +29,7 @@ import org.apache.kafka.common.security.authenticator.SaslServerAuthenticator;
 import org.apache.kafka.common.security.kerberos.KerberosShortNamer;
 import org.apache.kafka.common.security.ssl.SslFactory;
 import org.apache.kafka.common.utils.Java;
+import org.apache.kafka.server.interceptor.BrokerInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,7 +126,12 @@ public class SaslChannelBuilder implements ChannelBuilder {
             else
                 authenticator = buildClientAuthenticator(configs, id, socket.getInetAddress().getHostName(),
                         loginManager.serviceName(), transportLayer, loginManager.subject());
-            return new KafkaChannel(id, transportLayer, authenticator, maxReceiveSize, memoryPool != null ? memoryPool : MemoryPool.NONE);
+
+            BrokerInterceptor interceptor = null;
+            if (mode == Mode.SERVER)
+                interceptor = ChannelBuilders.buildBrokerInterceptor(configs);
+            return new KafkaChannel(id, transportLayer, authenticator, maxReceiveSize,
+                    memoryPool != null ? memoryPool : MemoryPool.NONE, interceptor);
         } catch (Exception e) {
             log.info("Failed to create channel due to ", e);
             throw new KafkaException(e);

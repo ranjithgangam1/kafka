@@ -35,6 +35,7 @@ import org.apache.kafka.common.metrics.Sensor
 import org.apache.kafka.common.network.ListenerName
 import org.apache.kafka.common.record.TimestampType
 import org.apache.kafka.common.security.auth.SecurityProtocol
+import org.apache.kafka.server.interceptor.{BrokerInterceptor, DefaultBrokerInterceptor}
 
 import scala.collection.JavaConverters._
 import scala.collection.Map
@@ -866,6 +867,10 @@ object KafkaConfig {
       .define(SaslKerberosMinTimeBeforeReloginProp, LONG, Defaults.SaslKerberosMinTimeBeforeRelogin, MEDIUM, SaslKerberosMinTimeBeforeReloginDoc)
       .define(SaslKerberosPrincipalToLocalRulesProp, LIST, Defaults.SaslKerberosPrincipalToLocalRules, MEDIUM, SaslKerberosPrincipalToLocalRulesDoc)
 
+      /** ********* Confluent Configuration ****************/
+      .define(BrokerSecurityConfigs.BROKER_INTERCEPTOR_CLASS_CONFIG, CLASS,
+        BrokerSecurityConfigs.BROKER_INTERCEPTOR_CLASS_DEFAULT, LOW,
+        BrokerSecurityConfigs.BROKER_INTERCEPTOR_CLASS_DOC)
   }
 
   def configNames() = configDef.names().asScala.toList.sorted
